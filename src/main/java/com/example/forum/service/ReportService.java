@@ -6,6 +6,9 @@ import com.example.forum.repository.entity.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,8 +23,7 @@ public class ReportService {
      */
     public List<ReportForm> findAllReport() {
         List<Report> results = reportRepository.findAll();
-        List<ReportForm> reports = setReportForm(results);
-        return reports;
+        return setReportForm(results);
     }
     /*
      * DBから取得したデータをFormに設定
@@ -29,11 +31,10 @@ public class ReportService {
     private List<ReportForm> setReportForm(List<Report> results) {
         List<ReportForm> reports = new ArrayList<>();
 
-        for (int i = 0; i < results.size(); i++) {
+        for (Report value : results) {
             ReportForm report = new ReportForm();
-            Report result = results.get(i);
-            report.setId(result.getId());
-            report.setContent(result.getContent());
+            report.setId(value.getId());
+            report.setContent(value.getContent());
             reports.add(report);
         }
         return reports;
@@ -81,6 +82,30 @@ public class ReportService {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("投稿が見つかりません:" + id));
         return setReportForm(Collections.singletonList(report)).get(0);
+    }
+
+    /*
+     *　絞り込み整形
+     */
+    public List<ReportForm> findByDateRange(String startDateStr, String endDateStr) {
+        //　文字列をLocalDateTimeに型変換
+        LocalDate startDate = LocalDate.parse(startDateStr);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDate endDate = LocalDate.parse(endDateStr);
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        List<Report> results = reportRepository.findByCreateDateBetween(startDateTime, endDateTime);
+        List<ReportForm> reports = new ArrayList<>();
+
+        for (Report value : results) {
+            ReportForm report = new ReportForm();
+            report.setId(value.getId());
+            report.setContent(value.getContent());
+            report.setCreateDate(value.getCreateDate());
+            report.setUpdateDate(value.getUpdateDate());
+            reports.add(report);
+        }
+        return reports;
     }
 }
 

@@ -14,6 +14,14 @@
         <button class="new-button" type="button">新規投稿</button>
     </a>
 
+    <div class="date-area">
+        <form action="/narrow" method="get">
+            開始日:<input type="date" name="startDate" th:value="${param.startDate}">
+            終了日:<input type="date" name="endDate" th:value="${param.endDate}">
+            <input type="submit" value="絞り込み">
+        </form>
+    </div>
+
     <!-- 投稿ループ -->
     <div class="message-icon" th:each="post : ${posts}">
         <div>

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comment")
 public class Comment {
@@ -35,7 +37,12 @@ public class Comment {
         this.content = content;
     }
 
-    public Report getPost() { return post;}
+    public Report getPost() {
+        return post;
+    }
 
-    public void setPost(Report post) {this.post = post;}
+    public void setPost(Report post) {
+        this.post = post;
+    }
 }
+

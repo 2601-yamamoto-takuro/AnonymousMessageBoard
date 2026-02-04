@@ -23,18 +23,9 @@ public class ReportController {
      */
     @GetMapping
     public ModelAndView top() {
-        ModelAndView mav = new ModelAndView();
-        // 投稿を全件取得
-        List<ReportForm> postsData = reportService.findAllReport();
-        // 投稿ごとにコメントをセット
-        for (ReportForm post : postsData) {
-            List<CommentForm> comments = commentService.findByPostId(post.getId());
-            post.setComments(comments);
-        }
-        // 画面遷移先を指定
-        mav.setViewName("/top");
-        mav.addObject("posts", postsData);
-        return mav;
+        return createTopView(
+                reportService.findAllReport()
+        );
     }
 
     /*
@@ -101,5 +92,29 @@ public class ReportController {
         reportService.saveReport(report);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * 投稿絞り込み処理
+     */
+    @GetMapping("/narrow")
+    public ModelAndView narrowContent (@RequestParam String startDate,
+                                       @RequestParam String endDate) {
+        return createTopView(
+                reportService.findByDateRange(startDate, endDate)
+        );
+    }
+
+
+    // トップ画面表示用共通処理
+    private ModelAndView createTopView(List<ReportForm> posts) {
+        for (ReportForm post : posts) {
+            post.setComments(commentService.findByPostId(post.getId()));
+        }
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("top");
+        mav.addObject("posts", posts);
+        return mav;
     }
 }
