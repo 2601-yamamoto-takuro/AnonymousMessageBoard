@@ -61,4 +61,30 @@ public class CommentController {
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
+
+    /*
+     * コメント編集画面表示処理
+     */
+    @GetMapping("/comments/edit/{id}")
+    public ModelAndView editContent(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        // 編集する投稿を取得
+        CommentForm comment = commentService.editReport(id);
+        // 編集する投稿をセット
+        mav.addObject("formModel", comment);
+        // 画面遷移先を指定
+        mav.setViewName("/commentedit");
+        return mav;
+    }
+
+    /*
+     * 編集処理
+     */
+    @PutMapping("/comments/update/{id}")
+    public ModelAndView updateContent (@PathVariable Integer id,
+                                       @ModelAttribute("formModel") CommentForm comment) {
+        comment.setId(id);
+        commentService.updateComment(id, comment.getContent());
+        return new ModelAndView("redirect:/");
+    }
 }

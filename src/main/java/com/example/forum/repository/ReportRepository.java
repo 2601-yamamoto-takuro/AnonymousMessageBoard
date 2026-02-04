@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
+    List<Report> findAllByOrderByUpdateDateDesc();
+
     List<Report> findByCreateDateBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

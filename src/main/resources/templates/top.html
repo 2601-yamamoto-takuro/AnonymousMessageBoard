@@ -39,8 +39,12 @@
             <form th:action="@{/comments/delete/{id}(id=${comment.id})}" th:method="delete">
                 <input type="submit" value="削除">
             </form>
+            <div class="comment-edit-button">
+                <a th:href="@{/comments/edit/{id}(id=${comment.id})}">
+                    <input type="button" value="編集">
+                </a>
+            </div>
         </div>
-
         <div class="delete-button">
             <form th:action="@{/delete/{id}(id=${post.id})}" th:method="delete">
                 <input type="submit" value="削除">

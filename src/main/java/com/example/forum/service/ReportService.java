@@ -22,7 +22,7 @@ public class ReportService {
      * 投稿全件取得処理
      */
     public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAll();
+        List<Report> results = reportRepository.findAllByOrderByUpdateDateDesc();
         return setReportForm(results);
     }
     /*

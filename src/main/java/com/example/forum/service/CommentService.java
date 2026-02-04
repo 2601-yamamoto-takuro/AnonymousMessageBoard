@@ -1,12 +1,15 @@
 package com.example.forum.service;
 
 import com.example.forum.controller.form.CommentForm;
+import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.CommentRepository;
 import com.example.forum.repository.entity.Comment;
 import com.example.forum.repository.entity.Report;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,8 @@ import java.util.List;
 public class CommentService {
     @Autowired
     CommentRepository commentRepository;
+    @Autowired
+    ReportRepository reportRepository;
 
     /*
      * DBから取得したデータをFormに設定
@@ -34,14 +39,17 @@ public class CommentService {
     /*
      * 返信追加
      */
-    public void saveComment(CommentForm form) {
+    public void saveComment(CommentForm reqComment) {
         Comment comment = new Comment();
-        comment.setContent(form.getContent());
+        comment.setContent(reqComment.getContent());
 
-        Report post = new Report();
-        post.setId(form.getPostId());
-        comment.setPost(post);
+        Report report = reportRepository.findById(reqComment.getPostId())
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        ;
+        report.setId(reqComment.getPostId());
+        comment.setPost(report);
 
+        report.setUpdateDate(LocalDateTime.now());
         commentRepository.save(comment);
     }
 
@@ -59,4 +67,22 @@ public class CommentService {
     public void deleteComment(Integer id) {
         commentRepository.deleteById(id);
     }
+
+    /*
+     * 編集画面用投稿1件取得
+     */
+    public CommentForm editReport(Integer id) {
+        List<Comment> results = new ArrayList<>();
+        results.add(commentRepository.findById(id).orElse(null));
+        List<CommentForm> reports = setCommentForm(results);
+        return reports.get(0);
+    }
+
+    @Transactional
+    public void updateComment(Integer id, String content) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        comment.setContent(content);
+    }
+
 }
