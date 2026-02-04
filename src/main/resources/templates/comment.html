@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>返信</title>
+</head>
+<body>
+<div class="header-contents">
+    <h2>返信</h2>
+</div>
+<div class="main-contents">
+    <!-- 投稿内容 -->
+    <div class="form-area">
+        <label>投稿内容</label>
+        <p class="tweet-box" th:text="${post.content}"></p>
+
+        <!-- 投稿に対するコメント -->
+        <div class="message-icon" th:each="comment : ${comments}">
+            <div class="text">
+                返信<br/>
+                <span th:text="${comment.content}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返信フォーム -->
+    <form th:action="@{/comments/add}" method="post" th:object="${formModel}">
+        <input type="hidden" th:field="*{postId}" th:value="${post.id}">
+        <div class="form-area">
+            <label>返信内容</label>
+            <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200"></textarea><br/>
+            <input type="submit" value="返信" />
+        </div>
+    </form>
+</div>
+
+<div class="footer-contents">
+    <form action="/">
+        <input type="submit" value="戻る" />
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>TOP</title>
+</head>
+<body>
+<div class="header-contents">
+    <h1>匿名掲示板</h1>
+</div>
+<div class="main-contents">
+    <a href="/new">
+        <button class="new-button" type="button">新規投稿</button>
+    </a>
+
+    <!-- 投稿ループ -->
+    <div class="message-icon" th:each="post : ${posts}">
+        <div>
+            ID : <span th:text="${post.id}"/>
+        </div>
+        <div class="text">
+            投稿 : <span th:text="${post.content}"/>
+        </div>
+
+        <!-- 投稿ごとのコメント -->
+        <div class="message-icon" th:each="comment : ${post.comments}">
+            <div class="text">
+                返信 : <span th:text="${comment.content}"/>
+            </div>
+            <form th:action="@{/comments/delete/{id}(id=${comment.id})}" th:method="delete">
+                <input type="submit" value="削除">
+            </form>
+        </div>
+
+        <div class="delete-button">
+            <form th:action="@{/delete/{id}(id=${post.id})}" th:method="delete">
+                <input type="submit" value="削除">
+            </form>
+        </div>
+        <div class="edit-button">
+            <a th:href="@{/edit/{id}(id=${post.id})}">
+                <input type="button" value="編集">
+            </a>
+        </div>
+        <div class="comment-button">
+            <a th:href="@{/comments/{id}(id=${post.id})}">
+                <input type="button" value="返信">
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
