@@ -57,7 +57,7 @@ public class CommentService {
      * 紐づいている返信を全件取得
      */
     public List<CommentForm> findByPostId(Integer postId) {
-        List<Comment> comments = commentRepository.findByPostId(postId);
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreateDateDesc(postId);
         return setCommentForm(comments);
     }
 
