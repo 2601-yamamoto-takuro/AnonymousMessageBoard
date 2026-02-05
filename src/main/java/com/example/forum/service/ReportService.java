@@ -88,13 +88,18 @@ public class ReportService {
      *　絞り込み整形
      */
     public List<ReportForm> findByDateRange(String startDateStr, String endDateStr) {
-        //　文字列をLocalDateTimeに型変換
-        LocalDate startDate = LocalDate.parse(startDateStr);
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDate endDate = LocalDate.parse(endDateStr);
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
-        List<Report> results = reportRepository.findByCreateDateBetween(startDateTime, endDateTime);
+        LocalDateTime startDateTime =
+                (startDateStr == null || startDateStr.isBlank())
+                        ? LocalDate.now().atStartOfDay()
+                        : LocalDate.parse(startDateStr).atStartOfDay();
+
+        LocalDateTime endDateTime =
+                (endDateStr == null || endDateStr.isBlank())
+                        ? LocalDate.now().atTime(LocalTime.MAX)
+                        : LocalDate.parse(endDateStr).atTime(LocalTime.MAX);
+
+    List<Report> results = reportRepository.findByCreateDateBetween(startDateTime, endDateTime);
         List<ReportForm> reports = new ArrayList<>();
 
         for (Report value : results) {
