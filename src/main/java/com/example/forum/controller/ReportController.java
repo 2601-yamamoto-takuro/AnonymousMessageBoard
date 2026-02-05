@@ -6,6 +6,8 @@ import com.example.forum.service.ReportService;
 import com.example.forum.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,7 +49,11 @@ public class ReportController {
      * 新規投稿処理
      */
     @PostMapping("/posts/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView addContent(@Validated @ModelAttribute("formModel") ReportForm reportForm,
+                                   BindingResult result){
+        if (result.hasErrors()) {
+            return new ModelAndView("/new");
+        }
         // 投稿をテーブルに格納
         reportService.saveReport(reportForm);
         // rootへリダイレクト
@@ -85,7 +91,11 @@ public class ReportController {
      */
     @PutMapping("/update/{id}")
     public ModelAndView updateContent (@PathVariable Integer id,
-                                       @ModelAttribute("formModel") ReportForm report) {
+                                       @Validated @ModelAttribute("formModel") ReportForm report,
+                                       BindingResult result) {
+        if (result.hasErrors()) {
+            return new ModelAndView("/new");
+        }
         // UrlParameterのidを更新するentityにセット
         report.setId(id);
         // 編集した投稿を更新

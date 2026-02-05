@@ -6,6 +6,8 @@ import com.example.forum.service.ReportService;
 import com.example.forum.service.CommentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -25,18 +27,18 @@ public class CommentController {
     @GetMapping("/comments/{postId}")
     public ModelAndView commentContent(@PathVariable Integer postId){
         ModelAndView mav = new ModelAndView();
-        // 投稿を全件取得
+        // 元の投稿を取得
         ReportForm postData = reportService.findById(postId);
+        mav.addObject("post", postData);
+        // 紐づいているコメントを取得
         List<CommentForm> commentData = commentService.findByPostId(postId);
+        mav.addObject("comments", commentData);
         // 画面遷移先を指定
         mav.setViewName("/comment");
         // 返信する投稿をセット
         CommentForm form = new CommentForm();
         form.setPostId(postId);
         mav.addObject("formModel", form);
-        // 投稿データオブジェクトを保管
-        mav.addObject("post", postData);
-        mav.addObject("comments", commentData);
         return mav;
     }
 
@@ -44,7 +46,16 @@ public class CommentController {
      * 新規返信処理
      */
     @PostMapping("/comments/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") CommentForm commentForm){
+    public ModelAndView addContent(@Validated @ModelAttribute("formModel") CommentForm commentForm,
+                                    BindingResult result){
+        if (result.hasErrors()) {
+            // GET の処理を呼んで Model を作り直す
+            ModelAndView mav = commentContent(commentForm.getPostId());
+
+            mav.addObject("formModel", commentForm);
+
+            return mav;
+        }
         // 返信をテーブルに格納
         commentService.saveComment(commentForm);
         // rootへリダイレクト
@@ -82,7 +93,11 @@ public class CommentController {
      */
     @PutMapping("/comments/update/{id}")
     public ModelAndView updateContent (@PathVariable Integer id,
-                                       @ModelAttribute("formModel") CommentForm comment) {
+                                       @Validated @ModelAttribute("formModel") CommentForm comment,
+                                       BindingResult result) {
+        if (result.hasErrors()) {
+            return new ModelAndView("/commentedit");
+        }
         comment.setId(id);
         commentService.updateComment(id, comment.getContent());
         return new ModelAndView("redirect:/");
